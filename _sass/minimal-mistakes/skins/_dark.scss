@@ -11,7 +11,7 @@ $code-background-color: mix(#000, $background-color, 15%) !default;
 $code-background-color-dark: mix(#000, $background-color, 20%) !default;
 $form-background-color: #000 !default; // mix(#000, $background-color, 15%)
 $footer-background-color: #000 !default; //mix(#000, $background-color, 30%)
-$link-color: #ecf3f3 !default; //mix($primary-color, $text-color, 40%)
+$link-color: #fff !default; //mix($primary-color, $text-color, 40%)
 $link-color-hover: #ecf3f3 !default; //mix(#fff, $link-color, 25%)
 $link-color-visited: #ecf3f3 !default; //mix(#000, $link-color, 25%)
 $masthead-link-color: $text-color !default;
