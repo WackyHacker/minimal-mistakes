@@ -137,6 +137,7 @@ img {
   -ms-interpolation-mode: bicubic;
   border: 1.5px solid #00c7ff;
   border-radius: 7px 7px;
+  filter: drop-shadow(0 2px 5px rgba(0, 219, 255, 0.7));
 }
 
 /* Prevent max-width from affecting Google Maps */
