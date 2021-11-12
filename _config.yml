@@ -132,9 +132,9 @@ footer:
     - label: "Bitbucket"
       icon: "fab fa-fw fa-bitbucket"
       # url:
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      # url:
+    - label: "HackTheBox"
+      icon: "fab fa-hackerrank"
+      url: "https://app.hackthebox.com/profile/305136"
 
 
 # Reading Files
