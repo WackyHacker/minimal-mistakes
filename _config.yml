@@ -133,7 +133,7 @@ footer:
       icon: "fab fa-fw fa-bitbucket"
       # url:
     - label: "HackTheBox"
-      icon: "fas fa-cube"
+      icon: "fab fa-fw fa-cube"
       url: "https://app.hackthebox.com/profile/305136"
 
 
