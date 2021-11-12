@@ -113,6 +113,9 @@ author:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/wackyhacker"
+    - label: "HackTheBox"
+      icon: "fas fa-cube"
+      url: "https://app.hackthebox.com/profile/305136"
 
 # Site Footer
 footer:
@@ -132,10 +135,6 @@ footer:
     - label: "Bitbucket"
       icon: "fab fa-fw fa-bitbucket"
       # url:
-    - label: "HackTheBox"
-      icon: "fab fa-fw fa-cube"
-      url: "https://app.hackthebox.com/profile/305136"
-
 
 # Reading Files
 include:
