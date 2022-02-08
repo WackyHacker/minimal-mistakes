@@ -116,6 +116,9 @@ author:
     - label: "HackTheBox"
       icon: "fas fa-cube"
       url: "https://app.hackthebox.com/profile/305136"
+    - label: "Exploit-db"
+      icon: "fas fa-spider"
+      url: "https://www.exploit-db.com/?author=11579"
 
 # Site Footer
 footer:
