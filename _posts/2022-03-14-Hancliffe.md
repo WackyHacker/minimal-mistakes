@@ -18,10 +18,6 @@ tags:
   - SSTI
 ---
 
-<p align="center">
-<img src="https://user-images.githubusercontent.com/69093629/137588497-e7175744-003c-4d58-b61c-86b13a057596.jpg">
-</p>
-
 Comence con un escaneo de Nmap para detectar puertos abiertos.
 
 ```bash
