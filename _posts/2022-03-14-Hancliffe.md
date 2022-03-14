@@ -774,4 +774,4 @@ Simplemente lo ejecute y gane acceso como Administrator.
   
 Y ya pude visualizar la *flag*.
 
-![158071328-48556507-c6ff-409a-8d34-4f81b018276b](https://user-images.githubusercontent.com/69093629/158269055-566edf0d-96e8-4a92-8df8-db85814f79ff.png)
+![tasca](https://user-images.githubusercontent.com/69093629/158272049-9f228e09-6f6a-478b-83b9-e4cea50e9add.jpg)
