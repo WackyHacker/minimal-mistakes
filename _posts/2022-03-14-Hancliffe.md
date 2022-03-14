@@ -405,7 +405,7 @@ Comencé comprobando que el *exploit* funcionaba bien.
 
 ![https://imgur.com/DjhCekr.png](https://imgur.com/DjhCekr.png)
 
-Lo segundo que hice fue desactivar *DEP*, ya que de lo contrario no podría ejecutar instrucciones en la pila, esto se puede hacer desde opciones de rendimiento.
+Lo segundo que hice fue desactivar *DEP*, ya que de lo contrario no podría ejecutar instrucciones desde la pila, esto se puede hacer desde opciones de rendimiento.
 
 ![image](https://user-images.githubusercontent.com/69093629/158053356-f85bd4e2-26b6-4eee-8443-bd67148422a2.png)
 
