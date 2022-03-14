@@ -1,7 +1,7 @@
 ---
 title: "Hancliffe - HackTheBox"
 layout: single
-excerpt: "Esta es una maquina dificil, para la intrusion me aprovecho un 'Server Side Template Injection' para ganar RCE, la escalada de privielegios se compone de un Binario vulnerable a 'Buffer Overflow' pero con una particularidad, poco espacio en la pila, por lo que hay que derivar a un 'Socket Reuse'."
+excerpt: "Esta es una máquina difícil, para la intrusión me aprovecho un 'Server Side Template Injection' para ganar RCE, la escalada de privilegios se compone de un Binario vulnerable a 'Buffer Overflow' pero con una particularidad, poco espacio en la pila, por lo que hay que derivar a un 'Socket Reuse'."
 header:
 show_date: true
 classes: wide
