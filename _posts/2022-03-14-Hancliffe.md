@@ -450,7 +450,7 @@ Este fue el resultado en la pestaña *References*.
 
 Hice un *breakpoint* en una dirección parecida a la que estaba en `push ebp`, en este caso `719023A8`, esta me iba a servir como "dirección de retorno", la sume a la variable `payload` en *little endian*.
 
-```python3
+```python
 payload = 66*"xBB" + p32(0x719023A8)
 ```
 
