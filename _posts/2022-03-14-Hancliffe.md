@@ -6,7 +6,7 @@ header:
 show_date: true
 classes: wide
 header:
-  teaser: "https://user-images.githubusercontent.com/69093629/158271218-a1c68404-ef4a-4ac9-b4cd-db0c26406656.jpg"
+  teaser: "https://user-images.githubusercontent.com/69093629/158450041-084d4b20-ff4f-4955-994a-6b51137f779e.jpg"
   teaser_home_page: true
   icon: "https://user-images.githubusercontent.com/69093629/125662338-fd8b3b19-3a48-4fb0-b07c-86c047265082.png"
 categories:
