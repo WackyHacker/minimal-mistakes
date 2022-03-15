@@ -551,7 +551,7 @@ Ejecute el *exploit* y *EAX* tenía la dirección en la que estaba el descriptor
  
 Tras hacer un `Step Into` ya tenía almacenado el descriptor en *ESI*, ya tenía el descriptor del *socket* hecho, ahora solo me quedaba el *buffer*, la longitud y las *flags*, pero tenía un pequeño inconveniente, *EIP* ira para abajo donde se puede encontrar con *ESP*, esto podría generar problemas.
 
-![image](https://user-images.githubusercontent.com/69093629/158069800-9f65129c-07de-4226-abe7-9ca123a0553e.png)
+![image](https://user-images.githubusercontent.com/69093629/158068152-32692d42-6f81-4c98-b351-7c4f5eadccab.png)
  
 Para solucionarlo simplemente resté 70 *bytes* a `ESP`.
 
