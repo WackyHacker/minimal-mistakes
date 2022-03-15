@@ -21,7 +21,8 @@ tags:
 Comencé con un escaneo de Nmap para detectar puertos abiertos.
 
 ```bash
-nmap -sS --min-rate 5000 -v -n -Pn -p- 10.10.11.115 -o nmap.txt
+┌──(root💀kali)-[/home/kali]
+└─$ nmap -sS --min-rate 5000 -v -n -Pn -p- 10.10.11.115 -o nmap.txt
 Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times may be slower.
 Warning: The -o option is deprecated. Please use -oN
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-03-12 04:53 EST
@@ -47,7 +48,8 @@ Nmap done: 1 IP address (1 host up) scanned in 26.50 seconds
 Hice otro para identificar la versión de cada servicio.
 
 ```bash
-nmap -sCV -p80,8000,9999 10.10.11.115 -o services.txt
+┌──(root💀kali)-[/home/kali]
+└─$ nmap -sCV -p80,8000,9999 10.10.11.115 -o services.txt
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-03-12 04:54 EST
 Nmap scan report for 10.10.11.115
 Host is up (0.056s latency).
