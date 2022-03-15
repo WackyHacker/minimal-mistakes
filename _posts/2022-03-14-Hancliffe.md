@@ -590,7 +590,7 @@ recv += b"\x53" 				# -> push ebx
 payload = recv + b"\xAA"*(66 - len(recv)) + p32(0x719023A8) + b"\xeb\xb8" # -> jmp $-70
 ```
 
-Ya que había restado 70 *bytes* en el *ESP*, hice que *EBX* tenga el valor de *ESP* para volver a sumar 70 *bytes* a *EBX* y caer en un punto intermedio donde están mis A, ahí pondré NOPS para que siga el flujo del programa sin problemas hasta *EBX* que estará apuntando a la función de *socket* `recv`, la cual contendrá suficiente espacio para almacenar el *shellcode*.
+Ya que había restado 70 *bytes* en el *ESP*, hice que *EBX* tenga el valor de *ESP* para volver a sumar 70 *bytes* a *EBX* y caer en un punto intermedio donde están mis A, ahí pondré NOPS para que siga el flujo del programa vaya sin problemas hasta *EBX* que estará apuntando a la función de *socket* `recv`, la cual contendrá suficiente espacio para almacenar el *shellcode*.
 
 ![image](https://camo.githubusercontent.com/6651c05abecefe0cbf059369452cf60482f710663713130d10c1c003d717f44d/68747470733a2f2f696d6775722e636f6d2f4b3975394e50552e706e67)
 ![image](https://camo.githubusercontent.com/e7dc879292922fb5ebb1d8a4c76ef811f6a5cbaffeb044edc132c73faeefa7cf/68747470733a2f2f696d6775722e636f6d2f374d324835366b2e706e67)
