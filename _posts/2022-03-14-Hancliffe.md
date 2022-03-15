@@ -430,7 +430,7 @@ La copie y la pegue en `pattern_offset`.
 Ahí esta, el *offset* son 66 *bytes* antes de sobrescribir *EIP*. Probé a enviar 100 B con la siguiente cadena actualizando la variable `payload`:
 
 ```python
-payload = 66*"\xBB"
+payload = 100*"\xBB"
 ```
 
 Este fue el resultado:
