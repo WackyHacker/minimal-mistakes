@@ -33,7 +33,6 @@ comments:
   utterances             :
     theme: "github-dark"
     issue_term: "pathname"
-    label: "comment"
   disqus:
     shortname            : # "https-wackyhacker-github-io"
   discourse:
