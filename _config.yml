@@ -31,8 +31,8 @@ words_per_minute         : 200
 comments:
   provider               : "utterances" # "disqus" #, "discourse", "facebook", "staticman", "staticman_v2", "utterances", "custom"
   utterances             :
-    theme: "dark-blue"
-    issue_term: "pathname"
+    theme                : "photon-dark"
+    issue_term           : "pathname"
   disqus:
     shortname            : # "https-wackyhacker-github-io"
   discourse:
