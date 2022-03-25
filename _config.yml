@@ -22,7 +22,7 @@ name                     : "WackyH4cker"
 description              : "Redacción de máquinas *CTF* hechas en plataformas como **HackTheBox** y **TryHackMe**."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
-repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
+repository               : "WackyHacker/wackyhacker.github.io" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : ""
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
@@ -30,6 +30,10 @@ breadcrumbs              : true # true, false (default)
 words_per_minute         : 200
 comments:
   provider               : "utterences" # "disqus" #, "discourse", "facebook", "staticman", "staticman_v2", "utterances", "custom"
+  utterences             :
+    theme: "github-dark"
+    issue_term: "pathname"
+    label: "comment"
   disqus:
     shortname            : # "https-wackyhacker-github-io"
   discourse:
