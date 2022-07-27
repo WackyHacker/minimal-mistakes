@@ -22,7 +22,12 @@
       <h3 class="author__name" itemprop="name">{{ author.name }}</h3>
     {% endif %}
     {% if author.bio %}
-      <div class="author__bio" itemprop="description" style="
+      <div class="author__bio" itemprop="description">
+        <p>root@kali:~#</p><p style="body{
+  padding: 40px;
+  background-color: #121212;  
+}
+
 p {
   border-right: solid 3px rgba(0,255,0,.75);
   white-space: nowrap;
@@ -50,8 +55,7 @@ p {
 @keyframes animated-cursor{
   from{border-right-color: rgba(0,255,0,.75);}
   to{border-right-color: transparent;}
-}">
-        {{ author.bio | markdownify }}
+}"> Cyber-Security Enthusiast</p>
       </div>
     {% endif %}
   </div>
