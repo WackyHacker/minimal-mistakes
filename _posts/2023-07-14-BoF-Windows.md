@@ -1,3 +1,23 @@
+---
+title: "Stack-Buffer Overflow [Windows x86] (Part II)"
+layout: single
+excerpt: "Esta es la segunda parte"
+header:
+show_date: true
+classes: wide
+header:
+ teaser: "https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/67f7e313-8807-4af1-abd3-2e53f6b4ec24"
+ teaser_home_page: true
+ icon: "https://user-images.githubusercontent.com/69093629/125662338-fd8b3b19-3a48-4fb0-b07c-86c047265082.png"
+categories:
+- Vulnerabilities
+tags:
+- EIP
+- Buffer Overflow
+- Minishare
+- Windows
+---
+![BUFFER](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/67f7e313-8807-4af1-abd3-2e53f6b4ec24)
 
 El 20 de febrero de 2022 publique mi primer articulo sobre como abordar una explotación de *Buffer overflow* de manera exitosa, además de comprender los conceptos básicos para su desempeño en sistemas operativos GNU/Linux. 
 
@@ -406,7 +426,7 @@ AAAAAAAAAA.... → \xeb\x30\x6b\7e → \x90\x90\x90\x90... → \xda\xda\xd9\x74\
 
 A continuación un video del *exploit* en ejecución:
 
-https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/ad802ef5-06d7-49c8-a82c-f38f9558da12
+<video src="https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/ad802ef5-06d7-49c8-a82c-f38f9558da12"></video>
 
 
 
