@@ -1,5 +1,7 @@
 ---
 title: "Stack-Buffer Overflow [Windows x86] (Part II)"
+lang: en
+ref: hello
 layout: single
 excerpt: "En este artículo, exploramos un exploit que sigue un flujo específico para obtener una shell remota. El proceso incluye la generación de bytes, un salto a la dirección de memoria ESP y la ejecución de un shellcode. A través de pasos detallados y el uso de herramientas como mona.py y msfvenom, demostramos cómo aprovechar una vulnerabilidad y lograr el objetivo deseado."
 header:
