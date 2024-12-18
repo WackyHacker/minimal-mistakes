@@ -222,22 +222,7 @@ plugins:
   - jekyll-feed
   - jekyll-include-cache
   - jekyll-seo-tag
-  - jekyll-chatgpt-translate
 
-chatgpt-translate:
-  model: gpt-3.5-turbo
-  source: en
-  layout: translated
-  targets: 
-    - 
-      language: zh
-      permalink: :year-:month-:day-:slug-chinese.html
-      layout: chinese-translated
-    - 
-      only: ru-post
-      language: fr
-      permalink: :year-:month-:day-:title-french.html
-  api_key_file: ".openai_api_key"
 # mimic GitHub Pages with --safe
 whitelist:
   - jekyll-paginate
