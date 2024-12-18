@@ -214,6 +214,7 @@ timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
 # Plugins (previously gems:)
+
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
@@ -221,6 +222,21 @@ plugins:
   - jekyll-feed
   - jekyll-include-cache
   - jekyll-seo-tag
+  - jekyll-chatgpt-translate
+
+chatgpt-translate:
+  model: gpt-3.5-turbo
+  source: en
+  layout: translated
+  targets: 
+    - 
+      language: zh
+      permalink: :year-:month-:day-:slug-chinese.html
+      layout: chinese-translated
+    - 
+      only: ru-post
+      language: fr
+      permalink: :year-:month-:day-:title-french.html
 
 # mimic GitHub Pages with --safe
 whitelist:
