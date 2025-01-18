@@ -186,12 +186,12 @@ Nmap done: 1 IP address (1 host up) scanned in 105.27 seconds
 
 We see much ports, we can to start with smb enumerating shares.
 
-![[Pasted image 20250116081134.png]]
+![image](https://github.com/user-attachments/assets/92931d71-8c96-417b-a5f7-b98a17c44eaf)
 
 There's a interesant share called `Department Shares`.
 We can to create a mount to we move more comfortably in our system.
 
-![[Pasted image 20250116083335.png]]
+![image](https://github.com/user-attachments/assets/0a9c85e7-af5b-467b-ab1b-de75de9558d9)
 
 if we list directories and files with tree, we will see a folder called `Users` containing possible usernames from the Active directory.
 
@@ -313,7 +313,7 @@ To check this we can see the `ACL` that we have on the directory, we will create
 for i in $(ls Users); do perm=$(smbcacls "//htb.local/Department Shares" Users/$i -N | grep Everyone) | echo "$i we have $perm"
 ```
 
-![[Pasted image 20250118074110.png]]
+![image](https://github.com/user-attachments/assets/708358c5-3a0e-4cce-a444-17afeb233086)
 
 `Public` have `Full`, we can to write in it. We will try to upload `SCF` file and get the `TGT`. The sintax of the scf file is the next.
 
@@ -351,17 +351,17 @@ We can to crack this hash with `john` using `rockyou.txt`.
 
 `$ john --wordlist=/usr/share/wordlists/rockyou.txt hash`
 
-![[Pasted image 20250118075503.png]]
+![image](https://github.com/user-attachments/assets/a3dff90d-4b1e-4ac3-b1fb-bf5115c81437)
 
 The credential is `Ashare1972`, if we will try to connect us in `WinRM` service, we will see that have a mistake.
 
-![[Pasted image 20250116100815.png]]
+![image](https://github.com/user-attachments/assets/d33598f5-1a29-410f-b513-f2d0bf258c7f)
 
 This problem happens it because isn't allowed to connect just with credentials, we need to connect with public and private key. This is a more secure way to connect to WinRM.
 
 So if we recall, there was a share called `Cert Enroll` in Samba.
 
-![[Pasted image 20250118080347.png]]
+![image](https://github.com/user-attachments/assets/2e1e6123-8be4-4ce8-8e13-8629e86a5de7)
 
 We are facing IIS. We will try do a fuzzing with this wordlist [IIS.fuzz.txt](https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Discovery/Web-Content/IIS.fuzz.txt).
 
@@ -387,21 +387,21 @@ ID           Response   Lines    Word       Chars       Payload
 
 We found `certsrv/` with `401 Unauthorized` meaning there is a login form.
 
-![[Pasted image 20250116101221.png]]
+![image](https://github.com/user-attachments/assets/814c89d8-bb1e-46ca-bc41-fb7a77dba1ba)
 
 if we try `amanda:Ashare1972` we will see that it works. This is because its configured with domain users. 
 
-![[Pasted image 20250116101302.png]]
+![image](https://github.com/user-attachments/assets/126f468a-2496-4061-ad97-be378260b038)
 
 We have a `Active Directory Certificat Services`.
 
-![[Pasted image 20250118094103.png]]
+![image](https://github.com/user-attachments/assets/0ba079bc-faa2-46ac-a37d-ff68c822040b)
 
 We can create a Public Key needed to access WinRM with `evil-winrm`.
 
-![[Pasted image 20250116101350.png]]
+![image](https://github.com/user-attachments/assets/26cf7a2f-f434-4e57-b2a5-96cc020dc905)
 
-![[Pasted image 20250116101512.png]]
+![image](https://github.com/user-attachments/assets/39c91fd6-1fde-4898-82c4-5c1eece39baa)
 
 Now, we need to create a private key and copy CSR file to create a valid public key.
 
@@ -435,15 +435,15 @@ An optional company name []:
 
 We paste the contents of the CSR file to request a public key.
 
-![[Pasted image 20250116101717.png]]
+![image](https://github.com/user-attachments/assets/8fd97a80-e3be-4258-addf-311e90cf0e6b)
 
 Now we can to download certificate.
 
-![[Pasted image 20250116101749.png]]
+![image](https://github.com/user-attachments/assets/74ee05b3-92c1-483d-9da7-6ace071fd960)
 
 Now we can to log in with `evil-winrm` using public and private key.
 
-![[Pasted image 20250116102040.png]]
+![image](https://github.com/user-attachments/assets/6cb9dfbd-b9ea-46fb-912e-4fc2d7355942)
 
 And we are satisfactorily inside.
 
@@ -451,7 +451,7 @@ There is nothing on the machine that could be escalated.
 
 Something that catches my attention is that it does not have an external kerberos port but yes internal.
 
-![[Pasted image 20250118095626.png]]
+![image](https://github.com/user-attachments/assets/878f8e01-ab31-4c70-b87e-4d34131e60c0)
 
 We have valid credentials, we could try a kerberoasting attack, but we need to have port 88 available externally or we could use `Rubeus.exe`. I prefer to do port forwarding of port 88 with chisel and perform the attack with `GetUserSPN.py`.
 
@@ -471,7 +471,7 @@ Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
 
 I Started a chisel server on my kali.
 
-![[Pasted image 20250118100755.png]]
+![image](https://github.com/user-attachments/assets/d747376c-eae6-4ed2-87f1-1edf082cfc39)
 
 Now i connected with windows chisel to my kali server.
 
@@ -538,10 +538,9 @@ INFO: Starting computer enumeration with 10 workers
 INFO: Querying computer: sizzle.HTB.LOCAL
 INFO: Done in 00M 21S
 ```
+![image](https://github.com/user-attachments/assets/b843926e-d669-41ed-9a17-115511a64b34)
 
 User `mrlky` can do `DCSync attack` because have `Get-Changes` and `Get-Changes-All` privileges.
-
-![[Pasted image 20250118103600.png]]
 
 We can use `secretsdump.py` to do the attack.
 
@@ -585,4 +584,4 @@ SIZZLE$:des-cbc-md5:c86846c83d947c2a
 
 Now we can simply pass the hash with `psexec` or `pth-winexe`.
 
-![[Pasted image 20250116153009.png]]
+![image](https://github.com/user-attachments/assets/99d0c99c-bb40-434b-a417-357b5595e233)
